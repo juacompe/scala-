@@ -4,8 +4,6 @@ object EntryPoint extends App {
     fetchAllResults(filter(keyword)) _ andThen
     writeToTargetFile)("source.txt")
 
-  def writeToTargetFile = writeFile(getFileName(keyword)) _
-
   def readSourcesFromFile(fileName: String) = {
     import scala.io.Source
     for {
@@ -48,6 +46,8 @@ object EntryPoint extends App {
       if (title.contains(keyword))
     } yield title
   }
+
+  def writeToTargetFile = writeFile(getFileName(keyword)) _
 
   def writeFile(filename: String)(content: String) = {
     import java.io.PrintWriter

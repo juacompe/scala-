@@ -11,15 +11,7 @@ list3.isEmpty
 mergeList(list3)
 mergeList(list)
 
-def increase(n: Int, list: List[Int]): List[Int] = {
-  @annotation.tailrec
-  def loop(n: Int, list: List[Int], sum: List[Int]): List[Int] = {
-    if (list.isEmpty) return sum
-    loop(n, list.tail, sum :+ list.head + n)
-  }
-  loop(n, list, List())
-}
-
+def increase = applyAll(add) _
 val l = List(1, 2, 3, 4, 5)
 val l0 = List(1)
 increase(1, l0)

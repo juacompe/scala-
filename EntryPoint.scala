@@ -12,14 +12,16 @@ object EntryPoint extends App {
   writeFile(getFileName(keyword), content)
 
   def fetchAllResults(urls: Array[String]): String = {
-    if (urls.isEmpty) ""
-    else
-      fetchFilteredResultsAsString(urls.head).concat(fetchAllResults(urls.tail))
-  }
-
-  def fetchFilteredResultsAsString(url: String) = {
-    def searchByKeyword = search(keyword) _
-    (fetchResults _ andThen searchByKeyword)(url).mkString("\n")
+    @annotation.tailrec
+    def loop(urls: Array[String], sum: String): String = {
+      if (urls.isEmpty) sum
+      else {
+        def fetchFilteredResultsAsString(url: String) =
+          (fetchResults _ andThen search(keyword) _)(url).mkString("\n")
+        loop(urls.tail, fetchFilteredResultsAsString(urls.head).concat(sum))
+      }
+    }
+    loop(urls, "")
   }
 
   def fetchResults(url: String): Seq[String] = {

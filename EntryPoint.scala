@@ -2,22 +2,28 @@ import scala.io.Source
 import scala.xml.{XML, Node, NodeSeq}
 
 object EntryPoint extends App {
-  val urls = for {
-    line <- Source.fromFile("source.txt").getLines.toArray
-    if line.contains("http://")
-  } yield line
-
+  val urls = readSourcesFromFile
   val keyword = "Ukraine"
-  val content = fetchAllResults(urls)
+  val content = fetchAllResults(urls, filter(keyword))
   writeFile(getFileName(keyword), content)
 
-  def fetchAllResults(urls: Array[String]): String = {
+  def readSourcesFromFile() = {
+    for {
+      line <- Source.fromFile("source.txt").getLines.toArray
+      if line.contains("http://")
+    } yield line
+  }
+
+  def fetchAllResults(
+      urls: Array[String],
+      filter: (Seq[String]) => Seq[String]
+  ): String = {
     @annotation.tailrec
     def loop(urls: Array[String], sum: String): String = {
       if (urls.isEmpty) sum
       else {
         def fetchFilteredResultsAsString(url: String) =
-          (fetchResults _ andThen filter(keyword) _)(url).mkString("\n")
+          (fetchResults _ andThen filter)(url).mkString("\n")
         loop(urls.tail, fetchFilteredResultsAsString(urls.head).concat(sum))
       }
     }

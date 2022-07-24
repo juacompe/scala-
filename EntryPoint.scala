@@ -11,16 +11,16 @@ object EntryPoint extends App {
   var titles = Seq[String]()
   urls.foreach(url => {
     val results = getResults(url, keyword)
-    titles = titles ++ results
+    val filteredResults = search(keyword, results)
+    titles = titles ++ filteredResults
   })
   var content = ""
   for (title <- titles) content = content.concat(title + "\n")
   writeFile(getFileName(keyword), content)
 
-  def getResults(url: String, keyword: String): Seq[String] = {
+  def getResults(url: String, keyword: String): NodeSeq = {
     val responseBody = getResponseBody(url)
-    val titles = XML.loadString(responseBody) \\ "item" \ "title"
-    val results = search(keyword, titles)
+    val results = XML.loadString(responseBody) \\ "item" \ "title"
     return results
   }
 

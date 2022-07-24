@@ -17,7 +17,7 @@ object EntryPoint extends App {
       if (urls.isEmpty) sum
       else {
         def fetchFilteredResultsAsString(url: String) =
-          (fetchResults _ andThen search(keyword) _)(url).mkString("\n")
+          (fetchResults _ andThen filter(keyword) _)(url).mkString("\n")
         loop(urls.tail, fetchFilteredResultsAsString(urls.head).concat(sum))
       }
     }
@@ -36,7 +36,7 @@ object EntryPoint extends App {
     return response.body
   }
 
-  def search(keyword: String)(titles: Seq[String]): Seq[String] = {
+  def filter(keyword: String)(titles: Seq[String]): Seq[String] = {
     for {
       title <- titles
       if (title.contains(keyword))

@@ -14,10 +14,10 @@ mergeList(list)
 def increase = applyAll(add) _
 val l = List(1, 2, 3, 4, 5)
 val l0 = List(1)
-increase(1, l0)
-increase(1, l)
+increase(1)(l0)
+increase(1)(l)
 
-def applyAll(func: (Int, Int) => Int)(n: Int, list: List[Int]): List[Int] = {
+def applyAll(func: (Int, Int) => Int)(n: Int)(list: List[Int]): List[Int] = {
   @annotation.tailrec
   def loop(
       func: (Int, Int) => Int,
@@ -31,9 +31,14 @@ def applyAll(func: (Int, Int) => Int)(n: Int, list: List[Int]): List[Int] = {
   loop(func, n, list, List())
 }
 
-multiplyAll(1, l0)
-multiplyAll(2, l)
+multiplyAll(1)(l0)
+multiplyAll(2)(l)
 
 def multiplyAll = applyAll(multiply) _
 def multiply(a: Int, b: Int) = a * b
 def add(a: Int, b: Int) = a + b
+
+def multiplyTwo = multiplyAll(2)
+def addFive = increase(5)
+
+(multiplyTwo andThen addFive)(l)

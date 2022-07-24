@@ -1,10 +1,10 @@
 object EntryPoint extends App {
   val keyword = "Ukraine"
-  val content =
-    (readSourcesFromFile _ andThen
-      fetchAllResults(filter(keyword)) _)("source.txt")
+  (readSourcesFromFile _ andThen
+    fetchAllResults(filter(keyword)) _ andThen
+    writeToTargetFile)("source.txt")
 
-  writeFile(getFileName(keyword))(content)
+  def writeToTargetFile = writeFile(getFileName(keyword)) _
 
   def readSourcesFromFile(fileName: String) = {
     import scala.io.Source

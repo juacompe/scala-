@@ -1,22 +1,21 @@
-import scala.io.Source
-import scala.xml.{XML, Node, NodeSeq}
-
 object EntryPoint extends App {
-  val urls = readSourcesFromFile
   val keyword = "Ukraine"
-  val content = fetchAllResults(urls, filter(keyword))
-  writeFile(getFileName(keyword), content)
+  val content =
+    (readSourcesFromFile _ andThen
+      fetchAllResults(filter(keyword)) _)("source.txt")
 
-  def readSourcesFromFile() = {
+  writeFile(getFileName(keyword))(content)
+
+  def readSourcesFromFile(fileName: String) = {
+    import scala.io.Source
     for {
-      line <- Source.fromFile("source.txt").getLines.toArray
+      line <- Source.fromFile(fileName).getLines.toArray
       if line.contains("http://")
     } yield line
   }
 
-  def fetchAllResults(
-      urls: Array[String],
-      filter: (Seq[String]) => Seq[String]
+  def fetchAllResults(filter: (Seq[String]) => Seq[String])(
+      urls: Array[String]
   ): String = {
     @annotation.tailrec
     def loop(urls: Array[String], sum: String): String = {
@@ -31,6 +30,7 @@ object EntryPoint extends App {
   }
 
   def fetchResults(url: String): Seq[String] = {
+    import scala.xml.{XML, Node, NodeSeq}
     val responseBody = getResponseBody(url)
     val titles = XML.loadString(responseBody) \\ "item" \ "title"
     for { (title) <- titles } yield title.text
@@ -49,7 +49,7 @@ object EntryPoint extends App {
     } yield title
   }
 
-  def writeFile(filename: String, content: String) = {
+  def writeFile(filename: String)(content: String) = {
     import java.io.PrintWriter
     new PrintWriter(filename) { write(content); close }
   }
